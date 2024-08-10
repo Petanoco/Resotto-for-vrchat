@@ -1,6 +1,6 @@
 @echo off
 
-set PACKAGE_NAME=GoldenBot
+set PACKAGE_NAME=Resotto
 set MAIN_SCRIPT=src\main.py
 
 pyinstaller --onefile --name %PACKAGE_NAME% %MAIN_SCRIPT% --icon images\favicon.ico

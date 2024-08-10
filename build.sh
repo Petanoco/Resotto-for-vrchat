@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE_NAME="GoldenBot"
+PACKAGE_NAME="Resotto"
 MAIN_SCRIPT="src/main.py"
 
 pyinstaller --onefile --name "$PACKAGE_NAME" "$MAIN_SCRIPT" --icon "images/favicon.ico"
