@@ -1,6 +1,6 @@
 # README.md
 
-チャンネルに画像を貼ると自動で指定サイズまで縮小してくれるDiscordBotです。
+チャンネル/DMに画像を貼ると自動で指定サイズ(VRChatで読み込めるサイズ)まで縮小してくれるDiscordBotです。
 
 ## 導入方法
 
@@ -20,15 +20,15 @@
          - `Read Message History`
          - `Add Reactions`
       ![](images/bot_setting_permissions.png)
-      3. `Generated URL`に生成されたURLを開き、好きなサーバーにBotを追加する
+      3. `Generated URL`に生成されたURLを開き、自分用のサーバーにBotを追加する
 2. Botを実行する
-   1. `config/config.json`を開き、`token`に1.3で控えたアクセストークンを貼り付ける
-   2. `GoldenBot.exe`を実行する
-3. おけまる🕊️
+   1. `config/config.json`をテキストエディタで開き、`token`に控えておいたアクセストークンを貼り付ける
+   2. `Resotto.exe`を実行する
+3. BotにDMで画像を送ると2048pxまで縮小される🕊️
 
 ## 使い方
 
-Botが参加しているサーバー(チャンネルホワイトリストが有効の場合は登録したチャンネル)
+Botが参加しているサーバー</br>
 もしくはDMで解像度の大きい画像を貼ると、自動的に縮小した画像でリプライされます.
 
 ## config.jsonの項目
