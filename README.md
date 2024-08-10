@@ -4,7 +4,6 @@
 
 ## 導入方法
 
-ローカルで動かす想定なので、各自でBotの作成が必要です
 1. Botの作成・登録
    1. [Dicord Developer Portal](https://discord.com/developers/applications)を開く
    2. New Application ボタンから新規Botを作る
@@ -23,7 +22,8 @@
 
 ## 使い方
 
-Botが参加しているサーバー(チャンネルホワイトリストが有効の場合は登録したチャンネル)で解像度の大きい画像を貼ると、自動的に縮小した画像でリプライされます.
+Botが参加しているサーバー(チャンネルホワイトリストが有効の場合は登録したチャンネル)
+もしくはDMで解像度の大きい画像を貼ると、自動的に縮小した画像でリプライされます.
 
 ## config.jsonの項目
 
@@ -39,5 +39,7 @@ Botが参加しているサーバー(チャンネルホワイトリストが有�
 
 ## コマンド
 
-- `/add_resize_channel`: コマンドを実行したチャンネルをホワイトリスト(is_whitelistedがTrueの場合のみ)へ追加します
-- `/remove_resize_channel`: コマンドを実行したチャンネルをホワイトリスト(is_whitelistedがTrueの場合のみ)から削除します
+- `/enable_channel_whitelist`: サーバーでチャンネルホワイトリスト機能を有効化します. 特定のチャンネル以外での画像処理を行わないようにします
+- `/disable_channel_whitelist`: サーバーでチャンネルホワイトリスト機能を無効化します
+- `/add_resize_channel`: コマンドを実行したチャンネルをホワイトリストへ追加します
+- `/remove_resize_channel`: コマンドを実行したチャンネルをホワイトリストから削除します
