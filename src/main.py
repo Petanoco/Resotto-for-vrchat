@@ -89,6 +89,7 @@ async def on_message(message: discord.Message):
     
     logging.info(f"Received message from {message.author.name}({message.author.id}) in {getChannelName(message.channel)}({message.channel.id}) with {len(message.attachments)} files")
     async with message.channel.typing():
+        await message.add_reaction("⏺️")
         output_files = []
         for attachment in image_filess:
             if (CONFIG.max_file_count>0) and (len(output_files) >= CONFIG.max_file_count):
@@ -106,12 +107,10 @@ async def on_message(message: discord.Message):
                 resized_image.save(byte_arr, format=image.format)
                 byte_arr.seek(0)
                 output_files.append(discord.File(fp=byte_arr, filename=f"resized_{attachment.filename}"))
-        
-        low_reso_files_count = len(image_filess) - len(output_files)
-        if low_reso_files_count > 0 :
-            await message.reply(files = output_files, content=f"{low_reso_files_count} 個の画像は解像度が十分低いため縮小されませんでした")
-        else:
+        if len(output_files) > 0:
             await message.reply(files = output_files)
+        await message.remove_reaction("⏺️", bot.user)
+        await message.add_reaction("☑")
 
 
 @app_commands.guild_only()

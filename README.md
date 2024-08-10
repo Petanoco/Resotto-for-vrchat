@@ -8,13 +8,19 @@
    1. [Dicord Developer Portal](https://discord.com/developers/applications)を開く
    2. New Application ボタンから新規Botを作る
    3. Botの設定画面が開くので、Botタブに移動して以下の項目を確認する
-      - `Build-A-Bot/TOKEN`: Reset Tokenボタンを押してアクセストークンを生成し、控えておく
+      - `Build-A-Bot/TOKEN`: Reset Tokenボタンを押してアクセストークンを生成し、控えておく</br>
+      ⚠️Botのパスワードに相当するものなので他人に教えないよう注意
       - `Privileged Gateway Intents/Message Content Intent`: 有効にする
    4. OAuth2タブに移動して、Botをサーバーへ登録するためのURLを生成する
       1. `SCOPES`の`bot`にチェック
-      2. `Bot Permissions`が開くので`Send Messages`, `Attach Files`にチェック
-      3. `Generated URL`に登録用URLが生成される
-   5. 4.で取得したURLを開き、好きなサーバーにBotを追加する
+      2. `Bot Permissions`が開くので、以下の項目に✅️
+         - `Send Messages`
+         - `Send Messages in Threads`
+         - `Attach Files`
+         - `Read Message History`
+         - `Add Reactions`
+      ![](images/bot_setting_permissions.png)
+      3. `Generated URL`に生成されたURLを開き、好きなサーバーにBotを追加する
 2. Botを実行する
    1. `config/config.json`を開き、`token`に1.3で控えたアクセストークンを貼り付ける
    2. `GoldenBot.exe`を実行する
