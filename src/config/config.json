@@ -1,10 +1,9 @@
 {
     "token": "",
-    "is_whitelisted": false,
     "presence": "コウモリだけが知っている",
     "target_resolution": 2048,
     "max_file_count": 4,
     "log_level": "INFO",
-    "ignore_user_ids": [],
-    "quality": 5
+    "quality": 5,
+    "use_timestamped_logfilename": true
 }

@@ -27,16 +27,15 @@ Botが参加しているサーバー(チャンネルホワイトリストが有�
 
 ## config.jsonの項目
 
-| 項目              | 説明                                                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| token             | アクセストークン                                                                                                                |
-| is_whitelisted    | trueの場合`/add_resize_channel``/remove_resize_channel`コマンドで指定したチャンネルでのみ処理を行います                         |
-| presence          | 「VRChatをプレイ中」みたいに表示されるBotのステータス                                                                           |
-| target_resolution | 変換先の解像度                                                                                                                  |
-| max_file_count    | 複数の添付ファイルがある場合に何枚まで処理するか                                                                                |
-| log_level         | ログレベル</br>NOTSET / DEBUG / INFO / WARN / ERROR / FATAL                                                                     |
-| ignore_user_ids   | ブラックリスト 他のBot等と干渉するならここへ                                                                                    |
-| quality           | 0~5で縮小アルゴリズムを指定します 大きい方が高品質</br>5:Lanczos / 4:Bicubic / 3:Hamming / 2:Bilinear / 1:BoxFilter / 0:Nearest |
+| 項目                        | 説明                                                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| token                       | アクセストークン                                                                                                                |
+| presence                    | 「VRChatをプレイ中」みたいに表示されるBotのステータス                                                                           |
+| target_resolution           | 変換先の解像度                                                                                                                  |
+| max_file_count              | 複数の添付ファイルがある場合に何枚まで処理するか                                                                                |
+| log_level                   | ログレベル</br>NOTSET / DEBUG / INFO / WARN / ERROR / FATAL                                                                     |
+| quality                     | 0~5で縮小アルゴリズムを指定します 大きい方が高品質</br>5:Lanczos / 4:Bicubic / 3:Hamming / 2:Bilinear / 1:BoxFilter / 0:Nearest |
+| use_timestamped_logfilename | ログファイルを実行毎に別名で保存するかどうか                                                                                    |
 
 ## コマンド
 
