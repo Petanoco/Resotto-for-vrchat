@@ -11,5 +11,4 @@ mkdir -p dist/log
 if [ ! -f "dist/config/config.json" ]; then
     cp src/config/config.json dist/config/
 fi
-
-rm -rf build
+cp README.md dist/.

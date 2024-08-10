@@ -11,4 +11,4 @@ if not exist "dist\config\config.json" (
     xcopy src\config\config.json dist\config\ /E /I /Y
 )
 
-rmdir /S /Q build
+xcopy README.md dist\ /I /Y

@@ -178,7 +178,7 @@ async def disable_channel_whitelist(interaction: discord.Interaction):
 def main():
     logging.getLogger('discord')
     maskedToken = '*' * len(CONFIG.token)
-    logging.info(f"Starting GoldenBot with token: {maskedToken}")
+    logging.info(f"Starting Bot with token: {maskedToken}")
     try:
         bot.run(CONFIG.token, log_level=CONFIG.log_level_value, log_handler=None)
     except discord.errors.LoginFailure:
