@@ -36,6 +36,7 @@ logging.basicConfig(
     level=CONFIG.log_level_value
 )
 
+discord.VoiceClient.warn_nacl= False
 
 class Resotto(commands.Bot):
     def __init__(self):
@@ -180,15 +181,19 @@ async def disable_channel_whitelist(interaction: discord.Interaction):
 def main():
     logging.getLogger('discord')
     maskedToken = '*' * len(CONFIG.token)
-    logging.info(f"Starting Bot with token: {maskedToken}")
-    try:
-        bot.run(CONFIG.token, log_level=CONFIG.log_level_value, log_handler=None)
-    except discord.errors.LoginFailure:
-        logging.fatal("認証に失敗しました")
-        raise
-    except discord.errors.PrivilegedIntentsRequired:
-        logging.fatal("必要な権限がありません, Botページから MessageContentIntent を有効化してください -> https://discord.com/developers/applications/")
-        raise
+    if len(maskedToken) == 0:
+        logging.fatal("トークンが未設定です, README.mdを見てBotのセットアップを行ってください")
+    else:
+        logging.info(f"Starting Bot with token: {maskedToken}")
+        try:
+            bot.run(CONFIG.token, log_level=CONFIG.log_level_value, log_handler=None)
+        except discord.errors.LoginFailure:
+            logging.fatal("認証に失敗しました")
+            raise
+        except discord.errors.PrivilegedIntentsRequired:
+            logging.fatal("必要な権限がありません, Botページから MessageContentIntent を有効化してください -> https://discord.com/developers/applications/")
+            raise
 
 if __name__ == "__main__":
     main()
+    input("Press enter to continue")
