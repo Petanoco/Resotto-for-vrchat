@@ -26,6 +26,8 @@ CONFIG: Config = Config.load()
 
 
 filename = FILE_LOG_TIMESTAMPED if CONFIG.use_timestamped_logfilename else FILE_LOG
+if not os.path.exists(DIRECTORY_LOG):
+    os.mkdir(DIRECTORY_LOG)
 logging.basicConfig(
     handlers=[
         logging.FileHandler(os.path.join(DIRECTORY_LOG, filename), encoding='utf-8', mode='w'),
