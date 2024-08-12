@@ -23,8 +23,9 @@
       ![](images/bot_setting_permissions.png)
       3. `Generated URL`に生成されたURLを開き、自分用のサーバーにBotを追加する
 2. Botを実行する
-   1. `config/config.json`をテキストエディタで開き、`token`欄に控えておいたアクセストークンを貼り付ける
-   2. `Resotto.exe`を実行する
+   1. [Resotto_vX.X.X_windows.zip](https://github.com/Petanoco/Resotto-for-vrchat/releases) をダウンロードして展開しておく
+   2. `config/config.json`をテキストエディタで開き、`token`欄に控えておいたアクセストークンを貼り付ける
+   3. `Resotto.exe`を実行する
 3. BotにDMで画像を送ると2048pxまで縮小される🕊️
 
 ## 使い方
