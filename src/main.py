@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from PIL import Image
-from fileloader import Config, ChannelsLoader, WhitelistableGuildsLoader
+from fileloader import *
 from typing import Union
 
 # ルートディレクトリを取得
@@ -20,9 +20,9 @@ else:
 DIRECTORY_LOG = os.path.join(root_path, "log")
 DIRECTORY_CONFIG = os.path.join(root_path, "config")
 FILE_LOG_TIMESTAMPED=f'fdiscord_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
-FILE_LOG='fdiscord.log'
+FILE_LOG='discord.log'
 
-CONFIG: Config = Config.load()
+CONFIG: Config = ConfigLoader.load()
 
 
 filename = FILE_LOG_TIMESTAMPED if CONFIG.use_timestamped_logfilename else FILE_LOG
@@ -57,7 +57,8 @@ class Resotto(commands.Bot):
 bot = Resotto()
 
 
-WHITELISTED_CHANNEL_IDS = ChannelsLoader.loadChannels()
+WHITELISTED_CHANNELS = ChannelsLoader.loadChannels()
+IMAGELOADER_CHANNEL_IDS = WHITELISTED_CHANNELS.imageloaderChannels
 WHITELISTED_GUILD_IDS = WhitelistableGuildsLoader.loadGuilds()
 
 def getChannelName(channel: Union[discord.TextChannel, discord.StageChannel, discord.VoiceChannel, discord.Thread, discord.DMChannel, discord.GroupChannel, discord.PartialMessageable]) -> str:
@@ -80,40 +81,43 @@ async def on_message(message: discord.Message):
     if (message.author.bot):
         return
     logging.debug("on_message fired")
-    is_whitelisted = (message.guild) and (message.guild.id in WHITELISTED_GUILD_IDS)
-    if (is_whitelisted) and (message.channel.id not in WHITELISTED_CHANNEL_IDS):
-        logging.debug("    message is sent in unlisted channel, skipped")
-        return
-    image_filess = [attachment for attachment in message.attachments if attachment.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
-    if (len(image_filess) == 0):
+    image_files = [attachment for attachment in message.attachments if attachment.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+    if (len(image_files) == 0):
         logging.debug("    message has no attachments, skipped")
         return
-    logging.debug("    passed")
     
-    logging.info(f"Received message from {message.author.name}({message.author.id}) in {getChannelName(message.channel)}({message.channel.id}) with {len(message.attachments)} files")
-    async with message.channel.typing():
-        await message.add_reaction("⏺️")
-        output_files = []
-        for attachment in image_filess:
-            if (CONFIG.max_file_count>0) and (len(output_files) >= CONFIG.max_file_count):
-                break
-            # 画像ファイルを展開
-            image = Image.open(io.BytesIO(await attachment.read()))
-            # 画像の縦横ピクセル数の大きい方が2048になるように等率で縮小
-            longerEdgeLength = max(image.width, image.height)
-            if (longerEdgeLength > CONFIG.target_resolution):
-                scale = min(CONFIG.target_resolution / image.width, CONFIG.target_resolution / image.height)
-                new_size = (int(image.width * scale), int(image.height * scale))
-                resized_image = image.resize(new_size, CONFIG.resampling_value)
-                # 画像をバイナリデータに変換
-                byte_arr = io.BytesIO()
-                resized_image.save(byte_arr, format=image.format)
-                byte_arr.seek(0)
-                output_files.append(discord.File(fp=byte_arr, filename=f"resized_{attachment.filename}"))
-        if len(output_files) > 0:
-            await message.reply(files = output_files)
-        await message.remove_reaction("⏺️", bot.user)
-        await message.add_reaction("☑")
+    is_whitelisted = (message.guild) and (message.guild.id in WHITELISTED_GUILD_IDS)
+    isTargetOfImageloader = (not is_whitelisted) or (message.channel.id in IMAGELOADER_CHANNEL_IDS)
+    isTargetAny = isTargetOfImageloader
+    
+    if (isTargetAny):
+        async with message.channel.typing():
+            await message.add_reaction("⏺️")
+            output_files = []
+            for i in range(min(len(image_files), CONFIG.max_file_count)):
+                attachment = image_files[i]
+                # 画像ファイルを展開
+                sourceImage = Image.open(io.BytesIO(await attachment.read()))
+                
+                # ImageLoader向けの処理:
+                # 画像の縦横ピクセル数の大きい方が2048になるように等率で縮小する
+                if (isTargetOfImageloader):
+                    #logging.info(f"Received message from {message.author.name}({message.author.id}) in {getChannelName(message.channel)}({message.channel.id}) with {len(message.attachments)} files")
+                    longerEdgeLength = max(sourceImage.width, sourceImage.height)
+                    if (longerEdgeLength > CONFIG.target_resolution):
+                        scale = min(CONFIG.target_resolution / sourceImage.width, CONFIG.target_resolution / sourceImage.height)
+                        new_size = (int(sourceImage.width * scale), int(sourceImage.height * scale))
+                        resized_image = sourceImage.resize(new_size, CONFIG.resampling_value)
+                        # 画像をバイナリデータに変換
+                        byte_arr = io.BytesIO()
+                        resized_image.save(byte_arr, format=sourceImage.format)
+                        byte_arr.seek(0)
+                        output_files.append(discord.File(fp=byte_arr, filename=f"resized_{attachment.filename}"))
+            
+            if len(output_files) > 0:
+                await message.reply(files = output_files)
+            await message.remove_reaction("⏺️", bot.user)
+            await message.add_reaction("☑")
 
 
 @app_commands.guild_only()
@@ -121,22 +125,22 @@ async def on_message(message: discord.Message):
 @app_commands.command(name ="add_resize_channel",description="チャンネルを画像処理のチェック対象に加えます(ホワイトリスト式の場合)")
 async def add_channel(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
-    if (interaction.channel_id not in WHITELISTED_CHANNEL_IDS):
+    if (interaction.channel_id not in WHITELISTED_CHANNELS.imageloaderChannels):
         logging.info(f"Add channel to the whitelist: {interaction.channel.name}@{interaction.channel.guild}({interaction.channel_id})")
-        WHITELISTED_CHANNEL_IDS.append(interaction.channel_id)
+        IMAGELOADER_CHANNEL_IDS.append(interaction.channel_id)
     await interaction.followup.send(f"channel: #{interaction.channel.name} added!")
-    ChannelsLoader.saveChannels(WHITELISTED_CHANNEL_IDS)
+    ChannelsLoader.saveChannels(WHITELISTED_CHANNELS)
 
 @app_commands.guild_only()
 @app_commands.default_permissions(manage_channels=True)
 @app_commands.command(name ="remove_resize_channel",description="チャンネルを画像処理のチェック対象から外します(チャンネルホワイトリスト有効の場合)")
 async def remove_channel(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
-    if (interaction.channel_id in WHITELISTED_CHANNEL_IDS):
+    if (interaction.channel_id in IMAGELOADER_CHANNEL_IDS):
         logging.info(f"Remove channel from the whitelist: {interaction.channel.name}@{interaction.channel.guild}({interaction.channel_id})")
-        WHITELISTED_CHANNEL_IDS.remove(interaction.channel_id)
+        IMAGELOADER_CHANNEL_IDS.remove(interaction.channel_id)
     await interaction.followup.send(f"channel: #{interaction.channel.name} added!")
-    ChannelsLoader.saveChannels(WHITELISTED_CHANNEL_IDS)
+    ChannelsLoader.saveChannels(WHITELISTED_CHANNELS)
 
 @app_commands.guild_only()
 @app_commands.command(name ="get_resize_channels",description="画像処理を行えるチャンネル一覧を表示します(チャンネルホワイトリスト有効の場合)")
@@ -145,7 +149,7 @@ async def get_channels(interaction: discord.Interaction):
     def get_is_guild(channel_id: int):
         channel = bot.get_channel(channel_id)
         return (channel) and (isinstance(channel, discord.TextChannel) or isinstance(channel, discord.Thread))
-    channels = [bot.get_channel(channel_id) for channel_id in WHITELISTED_CHANNEL_IDS if get_is_guild(channel_id)]
+    channels = [bot.get_channel(channel_id) for channel_id in IMAGELOADER_CHANNEL_IDS if get_is_guild(channel_id)]
     my_channels = [channel for channel in channels if (channel) and (channel.guild==interaction.guild)]
     message = "\n".join([f"[{c.name}](https://discord.com/channels/{c.guild.id}/{c.id})" for c in my_channels])
     await interaction.followup.send(message)

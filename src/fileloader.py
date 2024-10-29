@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from logging import getLogger, getLevelName
 import json
 from PIL.Image import Resampling
@@ -12,13 +12,8 @@ from discord.ext import commands
 class FileLoader:
     ROOT_DIRECTORY = os.path.dirname(sys.executable) if hasattr(sys, '_MEIPASS') else os.path.dirname(os.path.abspath(__file__))
 
-
 @dataclass
 class Config:
-    DIRECTORY_NAME: ClassVar[str] = "config"
-    FILE_NAME: ClassVar[str] = "config.json"
-    FILE_PATH: ClassVar[str] = os.path.join(FileLoader.ROOT_DIRECTORY, DIRECTORY_NAME, FILE_NAME)
-    
     token: str = ""
     presence: str = "aaa"
     target_resolution: int = 2048
@@ -28,6 +23,13 @@ class Config:
     quality: int = 5
     resampling_value: Resampling = Resampling.LANCZOS
     use_timestamped_logfilename:bool = False
+    allow_direct:bool = True
+
+@dataclass
+class ConfigLoader:
+    DIRECTORY_NAME: ClassVar[str] = "config"
+    FILE_NAME: ClassVar[str] = "config.json"
+    FILE_PATH: ClassVar[str] = os.path.join(FileLoader.ROOT_DIRECTORY, DIRECTORY_NAME, FILE_NAME)
 
     @staticmethod
     def getResamplingValue(quality: int) -> Resampling:
@@ -47,10 +49,10 @@ class Config:
     @staticmethod
     def load() -> 'Config':
         try:
-            with open(Config.FILE_PATH, 'r', encoding='utf-8') as file:
+            with open(ConfigLoader.FILE_PATH, 'r', encoding='utf-8') as file:
                 data = Config(**json.load(file))
                 data.log_level_value = getLevelName(data.log_level)
-                data.resampling_value = Config.getResamplingValue(data.quality)
+                data.resampling_value = ConfigLoader.getResamplingValue(data.quality)
                 return data
         except FileNotFoundError:
             getLogger().critical("設定ファイルが見つかりません")
@@ -59,6 +61,12 @@ class Config:
             getLogger().critical("設定ファイルの読み込みに失敗しました")
             raise
 
+@dataclass
+class SavedChannels:
+    imageloaderChannels: list[int] = field(default_factory=list)
+    galleryWideChannels: list[int] = field(default_factory=list)
+    gallerySquareChannels: list[int] = field(default_factory=list)
+    galleryWideToSquareChannels: list[int] = field(default_factory=list)
 
 @dataclass
 class ChannelsLoader:
@@ -67,10 +75,10 @@ class ChannelsLoader:
     FILE_PATH: ClassVar[str] = os.path.join(FileLoader.ROOT_DIRECTORY, DIRECTORY_NAME, FILE_NAME)
     
     @staticmethod
-    def saveChannels(channel_ids: list[int]):
+    def saveChannels(savedChannels: SavedChannels):
         try:
             with open(ChannelsLoader.FILE_PATH, "w", encoding="utf-8") as file:
-                json.dump(channel_ids, file, ensure_ascii=False, indent=4)
+                json.dump(asdict(savedChannels), file, ensure_ascii=False, indent=4)
         except PermissionError:
             logging.error("権限エラー: 設定ファイルを保存できません")
         except:
@@ -78,18 +86,12 @@ class ChannelsLoader:
             raise
             
     @staticmethod
-    def loadChannels() -> list[int]:
+    def loadChannels() -> SavedChannels:
         try:
             with open(ChannelsLoader.FILE_PATH, "r", encoding="utf-8") as file:
-                return json.load(file)
+                return SavedChannels(**json.load(file))
         except FileNotFoundError:
-            return list[int]()
-    
-    @staticmethod
-    def cleanupChannels(channel_ids: list[int], bot: discord.Client) -> list[int]:
-        all_channel_ids = [channel.id for channel in bot.get_all_channels()]
-        valid_channel_ids = [id for id in channel_ids if (id in all_channel_ids)]
-        return valid_channel_ids
+            return SavedChannels()
 
 @dataclass
 class WhitelistableGuildsLoader:
