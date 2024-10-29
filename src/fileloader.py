@@ -17,6 +17,8 @@ class Config:
     token: str = ""
     presence: str = "aaa"
     target_resolution: int = 2048
+    gallery_wide_resolution: int = 2048
+    gallery_square_resolution: int = 1024
     max_file_count: int = 4
     log_level:str = "INFO"
     log_level_value: int = getLevelName(log_level)
