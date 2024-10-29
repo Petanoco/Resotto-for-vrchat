@@ -2,8 +2,11 @@
     "token": "",
     "presence": "コウモリだけが知っている",
     "target_resolution": 2048,
+    "gallery_wide_resolution": 2048,
+    "gallery_square_resolution": 1024,
     "max_file_count": 4,
     "log_level": "INFO",
     "quality": 5,
-    "use_timestamped_logfilename": true
+    "use_timestamped_logfilename": true,
+    "allow_direct": true
 }

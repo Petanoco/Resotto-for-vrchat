@@ -110,6 +110,7 @@ async def on_message(message: discord.Message):
                 attachment = image_files[i]
                 # 画像ファイルを展開
                 sourceImage = Image.open(io.BytesIO(await attachment.read()))
+                logging.info(sourceImage.width)
                 
                 # ImageLoader向けの処理:
                 # 画像の縦横ピクセル数の大きい方が2048になるように等率で縮小する
@@ -131,7 +132,8 @@ async def on_message(message: discord.Message):
                 if (is_target_of_gallerywide):
                     image = arrange_aspect_wide(sourceImage)
                     # 縮小
-                    width, height = image.size
+                    width = image.width
+                    height = image.height
                     resized_image = image
                     if (width > CONFIG.gallery_wide_resolution):
                         target_width = CONFIG.gallery_wide_resolution
@@ -150,7 +152,8 @@ async def on_message(message: discord.Message):
                 if (is_target_of_gallerysquare):
                     image = arrange_aspect_square(sourceImage)
                     # 縮小
-                    width, height = image.size
+                    width = image.width
+                    height = image.height
                     resized_image = image
                     if (width > CONFIG.gallery_square_resolution):
                         new_size = (CONFIG.gallery_square_resolution, CONFIG.gallery_square_resolution)
@@ -166,7 +169,8 @@ async def on_message(message: discord.Message):
                 if (is_target_of_gallerywide2square):
                     image = arrange_aspect_photo2square(sourceImage)
                     # 縮小
-                    width, height = image.size
+                    width = image.width
+                    height = image.height
                     resized_image = image
                     if (width > CONFIG.gallery_wide_resolution):
                         target_width = CONFIG.gallery_wide_resolution
@@ -210,8 +214,6 @@ def arrange_aspect_square(sourceImage: Image):
             height = width
         elif((sourceImage.width) < (sourceImage.height)): # 縦長
             width = height
-        logging.debug(width)
-        logging.debug(height)
         # 1:1のアスペクト比のキャンバスを作成（透明ピクセルで埋める）
         aspect_ratio = (width, height)
         image = Image.new("RGBA", aspect_ratio, (0, 0, 0, 0))
@@ -219,7 +221,10 @@ def arrange_aspect_square(sourceImage: Image):
         offset_x = (image.width - sourceImage.width) // 2
         offset_y = (image.height - sourceImage.height) // 2
         image.paste(sourceImage, (offset_x, offset_y))
-        return image
+    else:
+        image = sourceImage
+    return image
+
 def arrange_aspect_photo2square(sourceImage: Image):
     return arrange_aspect_wide(arrange_aspect_square(sourceImage))
 
@@ -374,10 +379,6 @@ async def enable_channel_whitelist(interaction: discord.Interaction):
         logging.info(f"Whitelist is enabled: {interaction.guild.name}({interaction.guild_id})")
         WHITELISTED_GUILD_IDS.append(interaction.guild_id)
     await interaction.followup.send(f"Channel whitelist is enabled!")
-    logging.error(interaction.guild_id)
-    logging.warning(interaction.channel_id)
-    for id in WHITELISTED_GUILD_IDS:
-        logging.error(id)
     WhitelistableGuildsLoader.saveGuilds(WHITELISTED_GUILD_IDS)
 
 ## ホワイトリスト無効化

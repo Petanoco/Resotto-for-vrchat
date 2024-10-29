@@ -26,7 +26,7 @@
    1. [Resotto_vX.X.X_windows.zip](https://github.com/Petanoco/Resotto-for-vrchat/releases) をダウンロードして展開しておく
    2. `config/config.json`をテキストエディタで開き、`token`欄に控えておいたアクセストークンを貼り付ける
    3. `Resotto.exe`を実行する
-3. BotにDMで画像を送ると2048pxまで縮小される🕊️
+3. DMで画像を送るとリサイズされて返信が来る🕊️
 
 ## 使い方
 
@@ -40,6 +40,8 @@ Botが参加しているサーバー</br>
 | token                       | アクセストークン                                                                                                                 |
 | presence                    | 「VRChatをプレイ中」みたいに表示されるBotのステータス                                                                            |
 | target_resolution           | 変換先の解像度                                                                                                                   |
+| gallery_wide_resolution     | 変換先の解像度                                                                                                                   |
+| gallery_square_resolution   | 変換先の解像度                                                                                                                   |
 | max_file_count              | 複数の添付ファイルがある場合に何枚まで処理するか                                                                                 |
 | log_level                   | ログレベル</br>NOTSET / DEBUG / INFO / WARN / ERROR / FATAL                                                                      |
 | quality                     | 5～0で縮小アルゴリズムを指定します 大きい方が高品質</br>5:Lanczos / 4:Bicubic / 3:Hamming / 2:Bilinear / 1:BoxFilter / 0:Nearest |
@@ -49,5 +51,9 @@ Botが参加しているサーバー</br>
 
 - `/enable_channel_whitelist`: サーバーでチャンネルホワイトリスト機能を有効化します. 特定のチャンネル以外での画像処理を行わないようにします
 - `/disable_channel_whitelist`: サーバーでチャンネルホワイトリスト機能を無効化します
-- `/add_resize_channel`: コマンドを実行したチャンネルをホワイトリストへ追加します
-- `/remove_resize_channel`: コマンドを実行したチャンネルをホワイトリストから削除します
+- `add_workchannel_imageloader`: ImageLoader向け(2048以上の画像を2048に縮小する)機能を現在のチャンネルで使用可能にします
+- `remove_workchannel_imageloader`: ↑の指定を解除します
+- `add_workchannel_gallerywide`: ギャラリーフォト向け(16:9になるようマージンを追加、解像度を2048に縮小する)機能を、現在のチャンネルで使用可能にします
+- `add_workchannel_gallerysquare`: ギャラリーフォト向け(1:1になるようマージンを追加、解像度を1024に縮小する)機能を、現在のチャンネルで使用可能にします
+- `add_workchannel_wide2square`: 「ギャラリーにフォトとして追加し、フォトからステッカー等に登録する」ために適したリサイズ機能を、現在のチャンネルで使用可能にします
+- その他のremoveコマンドは省略
